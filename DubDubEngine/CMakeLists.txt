@@ -20,3 +20,12 @@ target_include_directories(DubDubEngine PRIVATE
 
 # Линкуем (связываем) твою программу с библиотекой GLFW
 target_link_libraries(DubDubEngine glfw)
+
+# Копируем шейдеры после сборки
+add_custom_command(TARGET DubDubEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/vertex_shader.glsl
+        ${CMAKE_SOURCE_DIR}/fragment_shader.glsl
+        $<TARGET_FILE_DIR:DubDubEngine>
+        COMMENT "Copying shader files..."
+)
