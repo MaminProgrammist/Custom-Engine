@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // Функция для загрузки шейдера из файла
 std::string loadShaderSource(const char* filepath) {
@@ -98,12 +101,24 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+
     // Игровой цикл
     while (!glfwWindowShouldClose(window)) {
+        float time = glfwGetTime();  // время с запуска программы
+        float scaleAmount = sin(time) * 0.5f + 1.0f;  // от 0.5 до 1.5
+
+        glm::mat4 transform = glm::mat4(1.0f);  // начинаем с единичной матрицы
+        transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, 1.0f));
+        transform = glm::translate(transform, glm::vec3(0.5f, 0.0f, 0.0f));
+        transform = glm::rotate(transform, time, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
